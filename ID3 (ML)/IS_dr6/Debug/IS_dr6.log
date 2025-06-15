@@ -1,0 +1,4 @@
+﻿  IS_dr6.cpp
+C:\Users\Aneliya\Desktop\ИС\HW6\IS_dr6\IS_dr6.cpp(144,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Aneliya\Desktop\ИС\HW6\IS_dr6\IS_dr6.cpp(288,51): warning C4305: 'argument': truncation from 'double' to 'float'
+  IS_dr6.vcxproj -> C:\Users\Aneliya\Desktop\ИС\HW6\IS_dr6\Debug\IS_dr6.exe
