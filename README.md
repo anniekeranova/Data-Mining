@@ -1,4 +1,4 @@
-# Machine-Learning
-# Machine Learning Tasks – University
+# Data-Mining
+# Data Mining Tasks – University
 
-This repository contains my solved university assignments in Machine Learning using C++.
+This repository contains my solved university assignments in Data Mining using C++.
