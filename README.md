@@ -1,2 +1,4 @@
 # Machine-Learning
-niversity exercises and solutions in Machine Learning using C++
+# Machine Learning Tasks – University
+
+This repository contains my solved university assignments in Machine Learning using C++.
