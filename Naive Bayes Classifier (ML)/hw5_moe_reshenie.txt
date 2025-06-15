@@ -1,0 +1,244 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <cmath>
+#include <algorithm>
+#include <random>
+#include <numeric>
+#include <iomanip>
+using namespace std;
+
+// Клас за обработка на данните
+class DataSet {
+private:
+    vector<vector<string>> data;
+    vector<string> headers;
+
+public:
+    DataSet(const vector<vector<string>>& inputData, const vector<string>& columnHeaders)
+        : data(inputData), headers(columnHeaders) {}
+
+    void validateData() {
+        for (auto it = data.begin(); it != data.end();) {
+            if (it->size() != headers.size()) {
+                it = data.erase(it); // Премахване на редове с грешен формат
+            }
+            else {
+                ++it;
+            }
+        }
+    }
+
+    void handleMissingValues(bool treatAsAbstain) {
+        for (size_t col = 1; col < headers.size(); ++col) {
+            map<string, int> valueCounts;
+            for (const auto& row : data) {
+                if (row[col] != "?") {
+                    valueCounts[row[col]]++;
+                }
+            }
+            string modeValue = "abstain";
+            if (!valueCounts.empty()) {
+                modeValue = max_element(valueCounts.begin(), valueCounts.end(),
+                    [](const pair<string, int>& a, const pair<string, int>& b) {
+                        return a.second < b.second;
+                    })->first;
+            }
+            for (auto& row : data) {
+                if (row[col] == "?") {
+                    row[col] = treatAsAbstain ? "abstain" : modeValue;
+                }
+            }
+        }
+    }
+
+    pair<DataSet, DataSet> splitData(float trainRatio) const {
+        vector<vector<string>> trainData, testData;
+        vector<vector<string>> shuffledData = data;
+        shuffle(shuffledData.begin(), shuffledData.end(), random_device());
+
+        size_t trainSize = static_cast<size_t>(shuffledData.size() * trainRatio);
+        trainData.insert(trainData.end(), shuffledData.begin(), shuffledData.begin() + trainSize);
+        testData.insert(testData.end(), shuffledData.begin() + trainSize, shuffledData.end());
+
+        return { DataSet(trainData, headers), DataSet(testData, headers) };
+    }
+
+    const vector<vector<string>>& getData() const { return data; }
+    const vector<string>& getHeaders() const { return headers; }
+};
+
+// Клас за Наивния Бейсов Класификатор
+class NaiveBayesClassifier {
+private:
+    map<string, map<string, map<string, double>>> probabilities;
+    map<string, int> classCounts;
+    int numSamples;
+
+public:
+    void train(const DataSet& dataset, double lambda) {
+        const auto& data = dataset.getData();
+        numSamples = data.size();
+        int numFeatures = data[0].size() - 1;
+
+        for (const auto& row : data) {
+            string classLabel = row[0];
+            classCounts[classLabel]++;
+
+            for (size_t i = 1; i <= numFeatures; ++i) {
+                probabilities[classLabel][to_string(i)][row[i]]++;
+            }
+        }
+
+        for (auto& classEntry : probabilities) {
+            string classLabel = classEntry.first;
+            for (auto& featureEntry : classEntry.second) {
+                auto& valueCounts = featureEntry.second;
+                int totalValues = classCounts[classLabel] + lambda * valueCounts.size();
+                for (auto& valueCount : valueCounts) {
+                    valueCount.second = (valueCount.second + lambda) / totalValues;
+                }
+            }
+        }
+    }
+
+    string predict(const vector<string>& instance, double lambda = 1.0) const {
+        map<string, double> classLogProbabilities;
+        for (const auto& classEntry : classCounts) {
+            string classLabel = classEntry.first;
+            classLogProbabilities[classLabel] = log(static_cast<double>(classEntry.second) / numSamples);
+
+            for (size_t i = 1; i < instance.size(); ++i) {
+                auto featureIt = probabilities.at(classLabel).find(to_string(i));
+                if (featureIt != probabilities.at(classLabel).end() &&
+                    featureIt->second.count(instance[i])) {
+                    classLogProbabilities[classLabel] += log(featureIt->second.at(instance[i]));
+                }
+                else {
+                    classLogProbabilities[classLabel] += log(lambda /
+                        (classCounts.at(classLabel) + lambda * probabilities.at(classLabel).at(to_string(i)).size()));
+                }
+            }
+        }
+
+        return max_element(classLogProbabilities.begin(), classLogProbabilities.end(),
+            [](const pair<string, double>& a, const pair<string, double>& b) {
+                return a.second < b.second;
+            })->first;
+    }
+
+    double evaluate(const DataSet& dataset) const {
+        const auto& data = dataset.getData();
+        int correct = 0;
+        for (const auto& row : data) {
+            if (predict(row) == row[0]) {
+                correct++;
+            }
+        }
+        return static_cast<double>(correct) / data.size() * 100;
+    }
+};
+
+double calculateStandardDeviation(const vector<double>& values, double mean) {
+    double variance = 0.0;
+    for (double value : values) {
+        variance += (value - mean) * (value - mean);
+    }
+    return sqrt(variance / values.size());
+}
+
+int main() {
+    ifstream file("house-votes-84.data");
+    if (!file.is_open()) {
+        cerr << "Error: Could not open the file 'house-votes-84.data'. Make sure it exists in the correct directory." << endl;
+        return 1;
+    }
+
+    vector<vector<string>> rawData;
+    string line;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        vector<string> row;
+        string value;
+        while (getline(ss, value, ',')) {
+            row.push_back(value);
+        }
+        rawData.push_back(row);
+    }
+
+    if (rawData.empty()) {
+        cerr << "Error: The file 'house-votes-84.data' is empty or contains invalid data." << endl;
+        return 1;
+    }
+
+    vector<string> columnHeaders = { "Class" };
+    for (int i = 1; i <= 16; ++i) {
+        columnHeaders.push_back("Attribute" + to_string(i));
+    }
+
+    DataSet dataset(rawData, columnHeaders);
+    dataset.validateData();
+
+    if (dataset.getData().empty()) {
+        cerr << "Error: All rows in the dataset were invalid. No data to process." << endl;
+        return 1;
+    }
+
+    int input;
+    cout << "Enter 0 to treat '?' as abstain, or 1 to fill missing values: ";
+    cin >> input;
+
+    dataset.handleMissingValues(input == 0);
+
+    auto [trainSet, testSet] = dataset.splitData(0.8);
+
+    NaiveBayesClassifier classifier;
+    classifier.train(trainSet, 1.0);
+
+    // Accuracy on training set
+    double trainAccuracy = classifier.evaluate(trainSet);
+    cout << "1. Train Set Accuracy:\n    Accuracy: " << fixed << setprecision(2) << trainAccuracy << "%" << endl;
+
+    // 10-Fold Cross-Validation
+    vector<double> foldAccuracies;
+    const auto& trainData = trainSet.getData();
+    size_t foldSize = trainData.size() / 10;
+
+    for (size_t i = 0; i < 10; ++i) {
+        vector<vector<string>> validationFold(trainData.begin() + i * foldSize,
+            (i == 9) ? trainData.end() : trainData.begin() + (i + 1) * foldSize);
+
+        vector<vector<string>> trainingFolds;
+        trainingFolds.insert(trainingFolds.end(), trainData.begin(), trainData.begin() + i * foldSize);
+        if (i != 9) {
+            trainingFolds.insert(trainingFolds.end(), trainData.begin() + (i + 1) * foldSize, trainData.end());
+        }
+
+        DataSet trainingSet(trainingFolds, trainSet.getHeaders());
+        DataSet validationSet(validationFold, trainSet.getHeaders());
+
+        NaiveBayesClassifier foldClassifier;
+        foldClassifier.train(trainingSet, 1.0);
+
+        double foldAccuracy = foldClassifier.evaluate(validationSet);
+        foldAccuracies.push_back(foldAccuracy);
+
+        cout << "    Accuracy Fold " << i + 1 << ": " << fixed << setprecision(2) << foldAccuracy << "%" << endl;
+    }
+
+    double meanAccuracy = accumulate(foldAccuracies.begin(), foldAccuracies.end(), 0.0) / foldAccuracies.size();
+    double stdDeviation = calculateStandardDeviation(foldAccuracies, meanAccuracy);
+
+    cout << "\n10-Fold Cross-Validation Results:\n";
+    cout << "    Average Accuracy: " << fixed << setprecision(2) << meanAccuracy << "%" << endl;
+    cout << "    Standard Deviation: " << fixed << setprecision(2) << stdDeviation << "%" << endl;
+
+    // Accuracy on test set
+    double testAccuracy = classifier.evaluate(testSet);
+    cout << "\n2. Test Set Accuracy:\n    Accuracy: " << fixed << setprecision(2) << testAccuracy << "%" << endl;
+
+    return 0;
+}

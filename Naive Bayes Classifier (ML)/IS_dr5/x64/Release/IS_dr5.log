@@ -1,0 +1,18 @@
+﻿  IS_dr5.cpp
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(81,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(82,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(97,27): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(193,40): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(193,11): error C2429: language feature 'structured bindings' requires compiler flag '/std:c++17'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(203,27): error C2530: 'trainRows': references must be initialized
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(204,32): error C3536: 'trainRows': cannot be used before it is initialized
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(211,94): error C2661: 'std::vector<std::vector<std::string,std::allocator<std::string>>,std::allocator<std::vector<std::string,std::allocator<std::string>>>>::insert': no overloaded function takes 1 arguments
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(213,102): error C2661: 'std::vector<std::vector<std::string,std::allocator<std::string>>,std::allocator<std::vector<std::string,std::allocator<std::string>>>>::insert': no overloaded function takes 1 arguments
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(216,50): error C2664: 'Data::Data(const Data &)': cannot convert argument 1 from 'std::vector<std::vector<std::string,std::allocator<std::string>>,std::allocator<std::vector<std::string,std::allocator<std::string>>>>' to 'const Data &'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(216,50): message : Reason: cannot convert from 'std::vector<std::vector<std::string,std::allocator<std::string>>,std::allocator<std::vector<std::string,std::allocator<std::string>>>>' to 'const Data'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(216,24): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(69,1): message : see declaration of 'Data::Data'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(217,46): error C2664: 'Data::Data(const Data &)': cannot convert argument 1 from 'std::vector<std::vector<std::string,std::allocator<std::string>>,std::allocator<std::vector<std::string,std::allocator<std::string>>>>' to 'const Data &'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(217,46): message : Reason: cannot convert from 'std::vector<std::vector<std::string,std::allocator<std::string>>,std::allocator<std::vector<std::string,std::allocator<std::string>>>>' to 'const Data'
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(217,22): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+C:\Users\Aneliya\Desktop\ИС\HW5\IS_dr5\IS_dr5.cpp(69,1): message : see declaration of 'Data::Data'

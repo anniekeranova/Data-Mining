@@ -1,0 +1,5 @@
+﻿  IS_dr5.cpp
+C:\Users\Aneliya\source\repos\IS_dr5\IS_dr5.cpp(87,34): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Aneliya\source\repos\IS_dr5\IS_dr5.cpp(101,34): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Aneliya\source\repos\IS_dr5\IS_dr5.cpp(145,53): warning C4305: 'argument': truncation from 'double' to 'float'
+  IS_dr5.vcxproj -> C:\Users\Aneliya\source\repos\IS_dr5\Debug\IS_dr5.exe
