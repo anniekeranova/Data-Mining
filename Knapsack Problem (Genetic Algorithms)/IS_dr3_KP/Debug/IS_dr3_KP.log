@@ -1,0 +1,3 @@
+﻿  IS_dr3_KP.cpp
+C:\Users\Aneliya\Desktop\ИС\HW3\IS_dr3_KP\IS_dr3_KP.cpp(138,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  IS_dr3_KP.vcxproj -> C:\Users\Aneliya\Desktop\ИС\HW3\IS_dr3_KP\Debug\IS_dr3_KP.exe

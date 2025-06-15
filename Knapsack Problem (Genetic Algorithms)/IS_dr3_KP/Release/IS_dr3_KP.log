@@ -1,0 +1,7 @@
+﻿  IS_dr3_KP.cpp
+C:\Users\Aneliya\Desktop\ИС\HW3\IS_dr3_KP\IS_dr3_KP.cpp(138,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Generating code
+  Previous IPDB and IOBJ mismatch, fall back to full compilation.
+  All 251 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  IS_dr3_KP.vcxproj -> C:\Users\Aneliya\Desktop\ИС\HW3\IS_dr3_KP\Release\IS_dr3_KP.exe

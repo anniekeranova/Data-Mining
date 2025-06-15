@@ -1,0 +1,146 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <chrono>
+using namespace std;
+using namespace chrono;
+
+// Структура за представяне на предмет
+struct Item {
+    int weight;
+    int value;
+};
+
+// Глобални променливи
+int M, N; // Максимална вместимост на раницата и брой предмети
+vector<Item> items;
+
+// Генератор на случайни числа с `rand()`
+int randomInt(int min, int max) {
+    return min + (rand() % (max - min + 1));
+}
+
+// Функция за оценяване (Fitness)
+int fitness(const vector<int>& solution) {
+    int totalWeight = 0, totalValue = 0;
+    for (int i = 0; i < N; i++) {
+        if (solution[i]) {
+            totalWeight += items[i].weight;
+            totalValue += items[i].value;
+        }
+    }
+    return (totalWeight <= M) ? totalValue : 0; // Наказание при надвишаване на теглото
+}
+
+// Селекция (Tournament Selection)
+vector<int> selectParent(const vector<vector<int>>& population, const vector<int>& fitnessValues) {
+    int bestIdx = randomInt(0, population.size() - 1);
+    for (int i = 1; i < 3; i++) { // Турнир между 3 индивида
+        int idx = randomInt(0, population.size() - 1);
+        if (fitnessValues[idx] > fitnessValues[bestIdx]) {
+            bestIdx = idx;
+        }
+    }
+    return population[bestIdx];
+}
+
+// Кръстосване (Single-Point Crossover)
+vector<int> crossover(const vector<int>& parent1, const vector<int>& parent2) {
+    int point = randomInt(0, N - 1);
+    vector<int> offspring(N);
+    for (int i = 0; i < N; i++) {
+        offspring[i] = (i < point) ? parent1[i] : parent2[i];
+    }
+    return offspring;
+}
+
+// Мутация
+void mutate(vector<int>& solution) {
+    int idx = randomInt(0, N - 1);
+    solution[idx] = 1 - solution[idx]; // Променяме бит
+}
+
+// Генетичен алгоритъм
+void geneticAlgorithm(int generations, int populationSize) {
+    // Инициализация на популацията
+    vector<vector<int>> population(populationSize, vector<int>(N));
+    for (auto& individual : population) {
+        for (int i = 0; i < N; i++) {
+            individual[i] = randomInt(0, 1);
+        }
+    }
+
+    vector<int> fitnessValues(populationSize);
+    int bestValue = 0;
+
+    // Еволюция
+    for (int gen = 0; gen <= generations; gen++) {
+        // Изчисляване на стойностите на фитнес
+        for (int i = 0; i < populationSize; i++) {
+            fitnessValues[i] = fitness(population[i]);
+        }
+
+        // Намиране на най-доброто решение
+        int currentBest = 0;
+        for (int value : fitnessValues) {
+            if (value > currentBest) {
+                currentBest = value;
+            }
+        }
+        bestValue = max(bestValue, currentBest);
+
+        // Отпечатване на стойността за определени поколения
+        if (gen == 0 || gen == generations || gen % (generations / 8) == 0) {
+            cout << bestValue << endl;
+        }
+
+        // Създаване на нова популация
+        vector<vector<int>> newPopulation;
+        for (int i = 0; i < populationSize / 2; i++) {
+            // Избор на родители
+            vector<int> parent1 = selectParent(population, fitnessValues);
+            vector<int> parent2 = selectParent(population, fitnessValues);
+
+            // Кръстосване
+            vector<int> offspring1 = crossover(parent1, parent2);
+            vector<int> offspring2 = crossover(parent2, parent1);
+
+            // Мутация
+            mutate(offspring1);
+            mutate(offspring2);
+
+            // Добавяне на новите индивиди
+            newPopulation.push_back(offspring1);
+            newPopulation.push_back(offspring2);
+        }
+        population = newPopulation;
+    }
+}
+
+int main() {
+    // Инициализиране на генератора за случайни числа
+    srand(time(0));
+
+    // Вход
+    cin >> M >> N;
+    items.resize(N);
+    for (int i = 0; i < N; i++) {
+        cin >> items[i].weight >> items[i].value;
+    }
+
+    // Параметри на алгоритъма
+    int generations = 50;
+    int populationSize = 100;
+
+    // Измерване на времето
+    auto start = high_resolution_clock::now();
+    geneticAlgorithm(generations, populationSize);
+    auto end = high_resolution_clock::now();
+
+    // Отпечатване на времето за изпълнение
+    double duration = duration_cast<chrono::duration<double>>(end - start).count();
+    cerr << "Execution Time: " << duration << " seconds" << endl;
+
+    return 0;
+}
